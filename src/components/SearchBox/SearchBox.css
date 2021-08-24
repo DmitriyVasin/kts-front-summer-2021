@@ -1,0 +1,7 @@
+.searchBox {
+  display: grid;
+  margin: 10px 20px;
+  height: 50px;
+  grid-template-columns: auto 50px;
+  grid-column-gap: 12px;
+}
