@@ -51,12 +51,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 242px;
-  color: val(--black);
+  color: var(--black);
 }
 
 .repoName a {
   text-decoration: none;
-  color: val(--black);
+  color: var(--black);
 }
 
 .orgName a {
@@ -65,7 +65,7 @@
 }
 
 .orgName a:hover {
-  color: val(--blue);
+  color: var(--blue);
 }
 
 .description span {
