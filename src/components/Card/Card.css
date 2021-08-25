@@ -6,7 +6,7 @@
   margin: 10px 20px;
   white-space: nowrap;
   align-items: center;
-  background-color: #FFFFFF;
+  background-color: var(--white);
 }
 
 .card:hover {
@@ -25,7 +25,7 @@
   width: 80px;
   height: 80px;
   line-height: 80px;
-  color: #FFFFFF;
+  color: var(--white);
   font-size: 40px;
   font-weight: bold;
 }
@@ -51,12 +51,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 242px;
-  color: #000000;
+  color: val(--black);
 }
 
 .repoName a {
   text-decoration: none;
-  color: #000000;
+  color: val(--black);
 }
 
 .orgName a {
@@ -65,7 +65,7 @@
 }
 
 .orgName a:hover {
-  color: #208FBF;
+  color: val(--blue);
 }
 
 .description span {
