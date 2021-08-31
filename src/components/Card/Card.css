@@ -30,12 +30,6 @@
   font-weight: bold;
 }
 
-.avatar img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
-
 .description {
   margin: 12px 12px 12px 6px;
   text-align: left;
@@ -52,19 +46,15 @@
   white-space: nowrap;
   width: 242px;
   color: var(--black);
-}
-
-.repoName a {
   text-decoration: none;
-  color: var(--black);
 }
 
-.orgName a {
+.orgName {
   text-decoration: none;
   color: var(--disabled-colour);
 }
 
-.orgName a:hover {
+.orgName:hover {
   color: var(--blue);
 }
 

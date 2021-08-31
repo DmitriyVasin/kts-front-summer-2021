@@ -1,32 +1,41 @@
-import Card from 'components/Card/Card'
-import SearchBox from 'components/SearchBox/SearchBox'
-import req from '../root/root'
-import * as React from 'react'
-import './Main.css'
+import * as React from "react";
 
-let start: any[] = []
+import Card from "components/Card/Card";
+import SearchBox from "components/SearchBox/SearchBox";
+
+import "./Main.css";
+
+import GitHubStore from "../store/GitHubStore/GitHubStore";
+
+const gitHubStore = new GitHubStore();
+
+const EXAMPLE_ORGANIZATION = "ktsstudio";
+
+let start: any[] = [];
 
 const Main: React.FC = () => {
-
-  const [repos, setRepos] = React.useState(start)
+  const [repos, setRepos] = React.useState(start);
 
   React.useEffect(() => {
-    req.then(result => {
-      setRepos(result.data)
-    })
-    // fetch('https://api.github.com/orgs/ktsstudio/repos')
-    //   .then(response => response.json())
-    //   .then(response => {
-    //     setRepos(response)
-    //   })
-  }, [])
+    gitHubStore
+      .getOrganizationReposList({
+        organizationName: EXAMPLE_ORGANIZATION,
+      })
+      .then((result) => {
+        /* eslint-disable no-console */
+        console.log(result);
+        setRepos(result.data);
+      });
+  }, []);
 
-  return <div className="grid">
-    <SearchBox />
-    {repos.map((i, k) => {
-      return  <Card {...i} key={k} />
-    })}
-  </div>
-}
+  return (
+    <div className="grid">
+      <SearchBox />
+      {repos.map((i) => {
+        return <Card {...i} key={i.id} />;
+      })}
+    </div>
+  );
+};
 
-export default Main
+export default Main;

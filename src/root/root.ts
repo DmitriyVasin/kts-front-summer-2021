@@ -1,13 +1,13 @@
-import GitHubStore from '../store/GitHubStore/GitHubStore';
+import GitHubStore from "../store/GitHubStore/GitHubStore";
 
 const gitHubStore = new GitHubStore();
 
-const EXAMPLE_ORGANIZATION = 'ktsstudio';
+const EXAMPLE_ORGANIZATION = "ktsstudio";
 
-export default gitHubStore.getOrganizationReposList({
-  organizationName: EXAMPLE_ORGANIZATION
-}).then(result => {
-  console.log(result);
-  return result
-})
-
+export default gitHubStore
+  .getOrganizationReposList({
+    organizationName: EXAMPLE_ORGANIZATION,
+  })
+  .then((result) => {
+    return result;
+  });
