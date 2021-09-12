@@ -3,7 +3,7 @@ import * as React from "react";
 import "./Avatar.css";
 
 type Props = {
-  src: string;
+  src?: string;
   alt: string;
   letter: string;
 };
@@ -11,8 +11,7 @@ type Props = {
 const Avatar: React.FC<Props> = ({ src, alt, letter }) => {
   return (
     <div className="avatar">
-      {src !== "" && <img src={src} alt={alt} />}
-      {src === "" && <span>{letter}</span>}
+      {src ? <img src={src} alt={alt} /> : <span>{letter}</span>}
     </div>
   );
 };

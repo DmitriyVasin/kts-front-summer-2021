@@ -8,9 +8,7 @@ import "./SearchBox.css";
 
 type Props = {
   searchInputValue: string;
-  handelOnChangeSearchInputValue: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  handelOnChangeSearchInputValue: (value: string) => void;
   handelOnClickSearchButton: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isLoading: boolean;
 };
@@ -27,9 +25,9 @@ const SearchBox: React.FC<Props> = ({
         value={searchInputValue}
         placeholder="Ведите название организации"
         onChange={handelOnChangeSearchInputValue}
-        isEnabled={isLoading}
+        disabled={isLoading}
       />
-      <Button onClick={handelOnClickSearchButton} isEnabled={isLoading}>
+      <Button onClick={handelOnClickSearchButton} disabled={isLoading}>
         <SearchIcon />
       </Button>
     </div>

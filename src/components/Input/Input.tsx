@@ -5,26 +5,25 @@ import "./Input.css";
 type Props = {
   value: string;
   placeholder: string;
-  isEnabled: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled: boolean;
+  onChange: (value: string) => void;
 };
 
-const Input: React.FC<Props> = ({
-  value,
-  placeholder,
-  isEnabled,
-  onChange,
-}) => {
+const Input: React.FC<Props> = ({ value, placeholder, disabled, onChange }) => {
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.currentTarget.value);
+  };
+
   return (
     <input
       value={value}
       type="text"
       placeholder={placeholder}
       className="searchInput"
-      onChange={onChange}
-      disabled={isEnabled}
+      onChange={onChangeInput}
+      disabled={disabled}
     />
   );
 };
 
-export default Input;
+export default React.memo(Input);

@@ -2,21 +2,17 @@ import * as React from "react";
 
 import Avatar from "@components/Avatar";
 import StarIcon from "@components/StarIcon/StarIcon";
-
 import "./Card.css";
+import { RepoItem } from "@store/GitHubStore/types";
 
 type Props = {
-  repoItem: any;
-  handelOnClickCard: (e: React.SyntheticEvent<HTMLElement>) => void;
+  repoItem: RepoItem;
+  onClickCard: (fullName: string) => void;
 };
 
-const Card: React.FC<Props> = ({ repoItem, handelOnClickCard }) => {
+const Card: React.FC<Props> = ({ repoItem, onClickCard }) => {
   return (
-    <div
-      className="card"
-      onClick={handelOnClickCard}
-      data-item={repoItem.full_name}
-    >
+    <div className="card" onClick={() => onClickCard(repoItem.full_name)}>
       <Avatar
         src={repoItem.owner.avatar_url}
         alt="avatar"
@@ -49,4 +45,4 @@ const Card: React.FC<Props> = ({ repoItem, handelOnClickCard }) => {
   );
 };
 
-export default Card;
+export default React.memo(Card);

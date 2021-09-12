@@ -5,24 +5,23 @@ import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import SearchBox from "@components/SearchBox";
 import "./Main.css";
 import GitHubStore from "@store/GitHubStore";
+import { RepoItems } from "@store/GitHubStore/types";
 
 const gitHubStore = new GitHubStore();
 
-let initial: any[] = [];
+let initial: RepoItems = [];
+let selectedRepoInintial: string | null = null;
 
 const Main: React.FC = () => {
   const [state, setstate] = React.useState({
     searchInputValue: "",
     isLoading: false,
     repos: initial,
-    selectedRepo: "",
-    repoBranchesDrawerVisible: false,
+    selectedRepo: selectedRepoInintial,
   });
 
-  const handelOnChangeSearchInputValue = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setstate({ ...state, searchInputValue: e.currentTarget.value });
+  const handelOnChangeSearchInputValue = (value: string) => {
+    setstate({ ...state, searchInputValue: value });
   };
 
   const handelOnClickSearchButton = (
@@ -46,22 +45,18 @@ const Main: React.FC = () => {
       });
   };
 
-  const handelOnClickCard = (e: React.SyntheticEvent<HTMLElement>) => {
-    const selectedRepo = e.currentTarget.dataset.item;
-    if (typeof selectedRepo !== "undefined") {
-      setstate({
-        ...state,
-        selectedRepo: selectedRepo,
-        repoBranchesDrawerVisible: true,
-      });
-    }
-    console.log(state);
+  const onClickCard = (fulname: string) => {
+    const selectedRepo = fulname;
+    setstate({
+      ...state,
+      selectedRepo: selectedRepo,
+    });
   };
 
   const handelOnCloseDrawer = () => {
     setstate({
       ...state,
-      repoBranchesDrawerVisible: false,
+      selectedRepo: null,
     });
   };
 
@@ -73,21 +68,18 @@ const Main: React.FC = () => {
         handelOnClickSearchButton={handelOnClickSearchButton}
         isLoading={state.isLoading}
       />
-      {/* eslint-disable no-console */ console.log(state.repos)}
-      {state.repos.length > 0 &&
-        state.repos.map((repoItem) => {
-          return (
-            <Card
-              repoItem={repoItem}
-              handelOnClickCard={handelOnClickCard}
-              key={repoItem.id}
-            />
-          );
-        })}
+      {state.repos.map((repoItem) => {
+        return (
+          <Card
+            repoItem={repoItem}
+            onClickCard={onClickCard}
+            key={repoItem.id}
+          />
+        );
+      })}
       {state.selectedRepo !== "" && (
         <RepoBranchesDrawer
           selectedRepo={state.selectedRepo}
-          repoBranchesDrawerVisible={state.repoBranchesDrawerVisible}
           handelOnCloseDrawer={handelOnCloseDrawer}
         />
       )}
