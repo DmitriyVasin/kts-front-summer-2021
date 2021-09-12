@@ -3,95 +3,136 @@ import * as React from "react";
 import Card from "@components/Card";
 import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import SearchBox from "@components/SearchBox";
-import "./Main.css";
 import GitHubStore from "@store/GitHubStore";
+import { RepoItems } from "@store/GitHubStore/types";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Route, useHistory } from "react-router-dom";
+
+import styles from "./Main.module.scss";
+
+type ReposContext = {
+  list: RepoItems;
+  isLoading: boolean;
+  load: (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
 
 const gitHubStore = new GitHubStore();
 
-let initial: any[] = [];
+const reposContext = React.createContext<ReposContext>({
+  list: [],
+  isLoading: false,
+  load: (e: React.MouseEvent<HTMLButtonElement>) => {},
+});
+
+const ReposProvider = reposContext.Provider;
+
+export const useReposContext = () => React.useContext(reposContext);
+
+let initial: RepoItems = [];
 
 const Main: React.FC = () => {
-  const [state, setstate] = React.useState({
+  const [state, setState] = React.useState({
     searchInputValue: "",
     isLoading: false,
     repos: initial,
-    selectedRepo: "",
-    repoBranchesDrawerVisible: false,
+    nextPage: 1,
   });
+
+  const history = useHistory();
+  const handleOnClickCard = (e: React.MouseEvent<HTMLElement>) => {
+    history.push(`/repos/${e.currentTarget.dataset.item}`);
+  };
 
   const handelOnChangeSearchInputValue = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setstate({ ...state, searchInputValue: e.currentTarget.value });
+    setState({ ...state, searchInputValue: e.currentTarget.value });
   };
 
-  const handelOnClickSearchButton = (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    setstate({ ...state, isLoading: true });
-    gitHubStore
+  const fetchReposPage = (pageNum?: number) => {
+    return gitHubStore
       .getOrganizationReposList({
         organizationName: state.searchInputValue,
+        data: {
+          page: pageNum ? pageNum : state.nextPage,
+          per_page: 10,
+        },
       })
       .then((result) => {
-        if (result.success) {
-          setstate({ ...state, repos: result.data, isLoading: false });
-        } else {
-          setstate({ ...state, repos: [], isLoading: false });
-        }
+        return result;
       })
       .catch((error) => {
+        return error;
         /* eslint-disable no-console */
         console.log(error);
       });
   };
 
-  const handelOnClickCard = (e: React.SyntheticEvent<HTMLElement>) => {
-    const selectedRepo = e.currentTarget.dataset.item;
-    if (typeof selectedRepo !== "undefined") {
-      setstate({
+  const handelOnClickSearchButton = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setState({ ...state, isLoading: true });
+    const result = await fetchReposPage(1);
+    if (result.success) {
+      setState({
         ...state,
-        selectedRepo: selectedRepo,
-        repoBranchesDrawerVisible: true,
+        repos: result.data,
+        isLoading: false,
+        nextPage: state.nextPage + 1,
       });
+    } else {
+      setState({ ...state, repos: [], isLoading: false });
     }
-    console.log(state);
   };
 
-  const handelOnCloseDrawer = () => {
-    setstate({
-      ...state,
-      repoBranchesDrawerVisible: false,
-    });
+  const nextPartOfRepos = async () => {
+    const result = await fetchReposPage();
+    if (result.success) {
+      setState({
+        ...state,
+        repos: [...state.repos, ...result.data],
+        isLoading: false,
+        nextPage: state.nextPage + 1,
+      });
+    } else {
+      setState({ ...state, repos: [], isLoading: false });
+    }
   };
 
   return (
-    <div className="grid">
-      <SearchBox
-        searchInputValue={state.searchInputValue}
-        handelOnChangeSearchInputValue={handelOnChangeSearchInputValue}
-        handelOnClickSearchButton={handelOnClickSearchButton}
-        isLoading={state.isLoading}
-      />
-      {/* eslint-disable no-console */ console.log(state.repos)}
-      {state.repos.length > 0 &&
-        state.repos.map((repoItem) => {
-          return (
-            <Card
-              repoItem={repoItem}
-              handelOnClickCard={handelOnClickCard}
-              key={repoItem.id}
-            />
-          );
-        })}
-      {state.selectedRepo !== "" && (
-        <RepoBranchesDrawer
-          selectedRepo={state.selectedRepo}
-          repoBranchesDrawerVisible={state.repoBranchesDrawerVisible}
-          handelOnCloseDrawer={handelOnCloseDrawer}
-        />
-      )}
-    </div>
+    <ReposProvider
+      value={{
+        list: state.repos,
+        isLoading: state.isLoading,
+        load: handelOnClickSearchButton,
+      }}
+    >
+      <div className={styles.grid}>
+        <InfiniteScroll
+          dataLength={state.repos.length}
+          next={nextPartOfRepos}
+          hasMore={true}
+          loader={<h4>Loading...</h4>}
+        >
+          <SearchBox
+            searchInputValue={state.searchInputValue}
+            handelOnChangeSearchInputValue={handelOnChangeSearchInputValue}
+          />
+          {/* eslint-disable no-console */ console.log("reneder", state)}
+          {state.repos.length > 0 &&
+            state.repos.map((repoItem) => {
+              return (
+                <Card
+                  repoItem={repoItem}
+                  key={repoItem.id}
+                  handleOnClickCard={handleOnClickCard}
+                />
+              );
+            })}
+          <Route path="/repos/:id" component={RepoBranchesDrawer} />
+        </InfiniteScroll>
+      </div>
+    </ReposProvider>
   );
 };
 

@@ -1,21 +1,45 @@
 import { ApiResponse } from "src/shared/store/ApiStore/types";
 
 export type GetOrganizationReposListParams = {
-    organizationName: string
-}
+  organizationName: string;
+  data?: {
+    per_page: number,
+    page: number,
+  };
+};
 
 export type GetRepoBranchParams = {
-  repoFullName: string
-}
+  repoFullName: string;
+};
 
-// export type RepoItem = {
-//     success: true;
-//     data: [];
-//     status: number;
-//   }
-export type RepoItems = any[];
+export type GetRepoByIdParams = {
+  repoId: string;
+};
 
-export type BranchItems = any[];
+export type GetRepoBranchListByIdParams = {
+  repoId: string;
+};
+
+export type RepoItem = {
+  id: string;
+  name: string;
+  full_name: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+    html_url: string;
+  };
+  html_url: string;
+  stargazers_count: number;
+  updated_at: string;
+};
+export type RepoItems = RepoItem[];
+
+export type BranchItem = {
+  id: string;
+  name: string;
+};
+export type BranchItems = BranchItem[];
 
 export type ErrorResp = {
     success: false;

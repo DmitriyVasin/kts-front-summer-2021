@@ -1,0 +1,8 @@
+@import "../../styles/variables.scss";
+.grid {
+  margin: 0 auto;
+  display: grid;
+  width: 400px;
+  border: 1px solid $main-bg;
+  background-color: $main-bg;
+}

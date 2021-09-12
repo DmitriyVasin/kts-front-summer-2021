@@ -1,0 +1,13 @@
+@import "../../styles/variables.scss";
+.searchInput {
+  border: 1px solid $colour;
+  border-radius: 6px;
+  padding: 12px;
+  &:hover {
+    border: 1px solid $hover-colour;
+  }
+  &:disabled {
+    border: 1px solid $colour;
+    color: $disabled-colour;
+  }
+}

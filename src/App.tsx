@@ -1,12 +1,18 @@
 import React from "react";
 
-import "./App.css";
 import Main from "@pages/Main";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <Main />
+      <BrowserRouter>
+        <Switch>
+          <Route path="/repos" component={Main} />
+          <Redirect to="/repos" />
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 }

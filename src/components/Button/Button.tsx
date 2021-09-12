@@ -1,15 +1,17 @@
 import * as React from "react";
 
-import "./Button.css";
+import { useReposContext } from "@pages/Main";
 
-type Props = React.PropsWithChildren<{
-  isEnabled: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}>;
+import styles from "./Button.module.scss";
 
-const Button: React.FC<Props> = ({ onClick, isEnabled, children }) => {
+const Button: React.FC = ({ children }) => {
+  const reposContext = useReposContext();
   return (
-    <button className="searchButton" onClick={onClick} disabled={isEnabled}>
+    <button
+      className={styles.searchButton}
+      onClick={reposContext.load}
+      disabled={reposContext.isLoading}
+    >
       {children}
     </button>
   );

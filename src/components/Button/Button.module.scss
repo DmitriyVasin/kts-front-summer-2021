@@ -1,0 +1,13 @@
+@import "../../styles/variables.scss";
+.searchButton {
+  background-color: $hover-colour;
+  height: 50px;
+  border-radius: 6px;
+  &:hover {
+    opacity: .7;
+  }
+  &:disabled {
+    background-color: $colour;
+    opacity: 1;
+  }
+}

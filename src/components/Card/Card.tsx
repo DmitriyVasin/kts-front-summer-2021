@@ -2,36 +2,38 @@ import * as React from "react";
 
 import Avatar from "@components/Avatar";
 import StarIcon from "@components/StarIcon/StarIcon";
+import { RepoItem } from "@store/GitHubStore/types";
+import { Link } from "react-router-dom";
 
-import "./Card.css";
+import styles from "./Card.module.scss";
 
 type Props = {
-  repoItem: any;
-  handelOnClickCard: (e: React.SyntheticEvent<HTMLElement>) => void;
+  repoItem: RepoItem;
+  handleOnClickCard: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-const Card: React.FC<Props> = ({ repoItem, handelOnClickCard }) => {
+const Card: React.FC<Props> = ({ repoItem, handleOnClickCard }) => {
   return (
     <div
-      className="card"
-      onClick={handelOnClickCard}
-      data-item={repoItem.full_name}
+      className={styles.card}
+      data-item={repoItem.id}
+      onClick={handleOnClickCard}
     >
       <Avatar
         src={repoItem.owner.avatar_url}
         alt="avatar"
         letter={repoItem.name[0].toUpperCase()}
       />
-      <div className="description">
+      <div className={styles.description}>
         <div>
-          <a className="repoName" href={repoItem.html_url}>
+          <a className={styles.repoName} href={repoItem.html_url}>
             {repoItem.name}
           </a>
         </div>
         <div>
-          <a className="orgName" href={repoItem.owner.html_url}>
+          <Link className={styles.orgName} to={repoItem.owner.html_url}>
             {repoItem.owner.login}
-          </a>
+          </Link>
         </div>
         <div>
           <StarIcon />

@@ -1,29 +1,26 @@
 import * as React from "react";
 
 import GitHubStore from "@store/GitHubStore";
+import { BranchItems } from "@store/GitHubStore/types";
 import { Drawer } from "antd";
 import { Divider } from "antd";
+import { useParams, useHistory } from "react-router-dom";
 
 const gitHubStore = new GitHubStore();
 
-type Props = {
-  selectedRepo: string;
-  repoBranchesDrawerVisible: boolean;
-  handelOnCloseDrawer: () => void;
+let initial: BranchItems = [];
+type selectedRepo = {
+  id: string;
 };
 
-let initial: any[] = [];
-
-const RepoBranchesDrawer: React.FC<Props> = ({
-  selectedRepo,
-  repoBranchesDrawerVisible,
-  handelOnCloseDrawer,
-}) => {
+const RepoBranchesDrawer: React.FC = () => {
   const [branches, setBranches] = React.useState(initial);
+  const selectedRepo: selectedRepo = useParams();
+  const history = useHistory();
   React.useEffect(() => {
     gitHubStore
-      .getRepoBranchList({
-        repoFullName: selectedRepo,
+      .getRepoBranchListById({
+        repoId: selectedRepo.id,
       })
       .then((result) => {
         if (result.success) {
@@ -38,19 +35,19 @@ const RepoBranchesDrawer: React.FC<Props> = ({
       });
   }, [selectedRepo]);
 
+  const handelOnClose = () => {
+    history.push("/repos");
+  };
+
   return (
-    <Drawer
-      placement="right"
-      onClose={handelOnCloseDrawer}
-      visible={repoBranchesDrawerVisible}
-    >
+    <Drawer placement="right" onClose={handelOnClose} visible={true}>
       {branches.length > 0 &&
         branches.map((branch) => {
           return (
-            <>
+            <div key={branch.id}>
               <p>{branch.name}</p>
               <Divider />
-            </>
+            </div>
           );
         })}
     </Drawer>
