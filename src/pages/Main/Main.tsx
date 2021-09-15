@@ -13,7 +13,7 @@ let initial: RepoItems = [];
 let selectedRepoInintial: string | null = null;
 
 const Main: React.FC = () => {
-  const [state, setstate] = React.useState({
+  const [state, setState] = React.useState({
     searchInputValue: "",
     isLoading: false,
     repos: initial,
@@ -21,40 +21,38 @@ const Main: React.FC = () => {
   });
 
   const handelOnChangeSearchInputValue = (value: string) => {
-    setstate({ ...state, searchInputValue: value });
+    setState({ ...state, searchInputValue: value });
   };
 
-  const handelOnClickSearchButton = (
+  const handelOnClickSearchButton = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    setstate({ ...state, isLoading: true });
-    gitHubStore
-      .getOrganizationReposList({
+    setState({ ...state, isLoading: true });
+    try {
+      const result = await gitHubStore.getOrganizationReposList({
         organizationName: state.searchInputValue,
-      })
-      .then((result) => {
-        if (result.success) {
-          setstate({ ...state, repos: result.data, isLoading: false });
-        } else {
-          setstate({ ...state, repos: [], isLoading: false });
-        }
-      })
-      .catch((error) => {
-        /* eslint-disable no-console */
-        console.log(error);
       });
+      if (result.success) {
+        setState({ ...state, repos: result.data, isLoading: false });
+      } else {
+        setState({ ...state, repos: [], isLoading: false });
+      }
+    } catch (error) {
+      /* eslint-disable no-console */
+      console.log(error);
+    }
   };
 
   const onClickCard = (fulname: string) => {
     const selectedRepo = fulname;
-    setstate({
+    setState({
       ...state,
       selectedRepo: selectedRepo,
     });
   };
 
   const handelOnCloseDrawer = () => {
-    setstate({
+    setState({
       ...state,
       selectedRepo: null,
     });
