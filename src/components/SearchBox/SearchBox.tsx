@@ -8,9 +8,7 @@ import styles from "./SearchBox.module.scss";
 
 type Props = {
   searchInputValue: string;
-  handelOnChangeSearchInputValue: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  handelOnChangeSearchInputValue: (value: string) => void;
 };
 
 const SearchBox: React.FC<Props> = ({

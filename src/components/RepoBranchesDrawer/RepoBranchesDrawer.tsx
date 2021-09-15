@@ -8,31 +8,25 @@ import { useParams, useHistory } from "react-router-dom";
 
 const gitHubStore = new GitHubStore();
 
-let initial: BranchItems = [];
 type selectedRepo = {
   id: string;
 };
 
 const RepoBranchesDrawer: React.FC = () => {
-  const [branches, setBranches] = React.useState(initial);
+  const [branches, setBranches] = React.useState<BranchItems>([]);
   const selectedRepo: selectedRepo = useParams();
   const history = useHistory();
   React.useEffect(() => {
-    gitHubStore
-      .getRepoBranchListById({
+    (async () => {
+      const result = await gitHubStore.getRepoBranchListById({
         repoId: selectedRepo.id,
-      })
-      .then((result) => {
-        if (result.success) {
-          setBranches(result.data);
-        } else {
-          setBranches([]);
-        }
-      })
-      .catch((error) => {
-        /* eslint-disable no-console */
-        console.log(error);
       });
+      if (result.success) {
+        setBranches(result.data);
+      } else {
+        setBranches([]);
+      }
+    })();
   }, [selectedRepo]);
 
   const handelOnClose = () => {
@@ -41,17 +35,16 @@ const RepoBranchesDrawer: React.FC = () => {
 
   return (
     <Drawer placement="right" onClose={handelOnClose} visible={true}>
-      {branches.length > 0 &&
-        branches.map((branch) => {
-          return (
-            <div key={branch.id}>
-              <p>{branch.name}</p>
-              <Divider />
-            </div>
-          );
-        })}
+      {branches.map((branch) => {
+        return (
+          <div key={branch.id}>
+            <p>{branch.name}</p>
+            <Divider />
+          </div>
+        );
+      })}
     </Drawer>
   );
 };
 
-export default RepoBranchesDrawer;
+export default React.memo(RepoBranchesDrawer);

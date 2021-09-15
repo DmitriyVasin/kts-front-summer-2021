@@ -9,15 +9,16 @@ import styles from "./Card.module.scss";
 
 type Props = {
   repoItem: RepoItem;
-  handleOnClickCard: (e: React.MouseEvent<HTMLElement>) => void;
+  onClickCard: (id: string) => void;
 };
 
-const Card: React.FC<Props> = ({ repoItem, handleOnClickCard }) => {
+const Card: React.FC<Props> = ({ repoItem, onClickCard }) => {
   return (
     <div
       className={styles.card}
-      data-item={repoItem.id}
-      onClick={handleOnClickCard}
+      onClick={() => {
+        onClickCard(repoItem.id);
+      }}
     >
       <Avatar
         src={repoItem.owner.avatar_url}
@@ -51,4 +52,4 @@ const Card: React.FC<Props> = ({ repoItem, handleOnClickCard }) => {
   );
 };
 
-export default Card;
+export default React.memo(Card);

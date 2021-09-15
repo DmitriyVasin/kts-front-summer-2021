@@ -21,7 +21,9 @@ const gitHubStore = new GitHubStore();
 const reposContext = React.createContext<ReposContext>({
   list: [],
   isLoading: false,
-  load: (e: React.MouseEvent<HTMLButtonElement>) => {},
+  load: (e: React.MouseEvent<HTMLButtonElement>) => {
+    // const loadVar = 0;
+  },
 });
 
 const ReposProvider = reposContext.Provider;
@@ -32,71 +34,62 @@ let initial: RepoItems = [];
 
 const Main: React.FC = () => {
   const [state, setState] = React.useState({
-    searchInputValue: "",
     isLoading: false,
     repos: initial,
+  });
+
+  const [searchInputValue, setSearchInputValue] = React.useState("");
+
+  const [infiniteScrollState, setInfiniteScrollState] = React.useState({
     nextPage: 1,
+    hasMore: true,
   });
 
   const history = useHistory();
-  const handleOnClickCard = (e: React.MouseEvent<HTMLElement>) => {
-    history.push(`/repos/${e.currentTarget.dataset.item}`);
+  const onClickCard = (id: string) => {
+    history.push(`/repos/${id}`);
   };
 
-  const handelOnChangeSearchInputValue = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setState({ ...state, searchInputValue: e.currentTarget.value });
+  const handelOnChangeSearchInputValue = (value: string) => {
+    setSearchInputValue(value);
   };
 
-  const fetchReposPage = (pageNum?: number) => {
-    return gitHubStore
-      .getOrganizationReposList({
-        organizationName: state.searchInputValue,
-        data: {
-          page: pageNum ? pageNum : state.nextPage,
-          per_page: 10,
-        },
-      })
-      .then((result) => {
-        return result;
-      })
-      .catch((error) => {
-        return error;
-        /* eslint-disable no-console */
-        console.log(error);
+  const fetchReposPage = async (pageNum?: number) => {
+    const result = await gitHubStore.getOrganizationReposList({
+      organizationName: searchInputValue,
+      data: {
+        page: pageNum ? pageNum : infiniteScrollState.nextPage,
+        per_page: 10,
+      },
+    });
+    if (result.success) {
+      setState({
+        ...state,
+        repos: [...state.repos, ...result.data],
+        isLoading: false,
       });
+      if (result.data.length < 10) {
+        setInfiniteScrollState({ ...infiniteScrollState, hasMore: false });
+      } else {
+        setInfiniteScrollState({
+          ...infiniteScrollState,
+          nextPage: infiniteScrollState.nextPage + 1,
+        });
+      }
+    } else {
+      setState({ ...state, repos: [], isLoading: false });
+    }
   };
 
   const handelOnClickSearchButton = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     setState({ ...state, isLoading: true });
-    const result = await fetchReposPage(1);
-    if (result.success) {
-      setState({
-        ...state,
-        repos: result.data,
-        isLoading: false,
-        nextPage: state.nextPage + 1,
-      });
-    } else {
-      setState({ ...state, repos: [], isLoading: false });
-    }
+    await fetchReposPage(1);
   };
 
   const nextPartOfRepos = async () => {
-    const result = await fetchReposPage();
-    if (result.success) {
-      setState({
-        ...state,
-        repos: [...state.repos, ...result.data],
-        isLoading: false,
-        nextPage: state.nextPage + 1,
-      });
-    } else {
-      setState({ ...state, repos: [], isLoading: false });
-    }
+    await fetchReposPage();
   };
 
   return (
@@ -111,24 +104,27 @@ const Main: React.FC = () => {
         <InfiniteScroll
           dataLength={state.repos.length}
           next={nextPartOfRepos}
-          hasMore={true}
+          hasMore={infiniteScrollState.hasMore}
           loader={<h4>Loading...</h4>}
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
         >
           <SearchBox
-            searchInputValue={state.searchInputValue}
+            searchInputValue={searchInputValue}
             handelOnChangeSearchInputValue={handelOnChangeSearchInputValue}
           />
-          {/* eslint-disable no-console */ console.log("reneder", state)}
-          {state.repos.length > 0 &&
-            state.repos.map((repoItem) => {
-              return (
-                <Card
-                  repoItem={repoItem}
-                  key={repoItem.id}
-                  handleOnClickCard={handleOnClickCard}
-                />
-              );
-            })}
+          {state.repos.map((repoItem) => {
+            return (
+              <Card
+                repoItem={repoItem}
+                key={repoItem.id}
+                onClickCard={onClickCard}
+              />
+            );
+          })}
           <Route path="/repos/:id" component={RepoBranchesDrawer} />
         </InfiniteScroll>
       </div>
