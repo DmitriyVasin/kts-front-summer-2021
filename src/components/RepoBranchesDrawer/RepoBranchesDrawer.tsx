@@ -17,7 +17,7 @@ const RepoBranchesDrawer: React.FC = () => {
   const selectedRepo: selectedRepo = useParams();
   const history = useHistory();
   React.useEffect(() => {
-    (async () => {
+    const fetchBranches = async () => {
       const result = await gitHubStore.getRepoBranchListById({
         repoId: selectedRepo.id,
       });
@@ -26,7 +26,8 @@ const RepoBranchesDrawer: React.FC = () => {
       } else {
         setBranches([]);
       }
-    })();
+    };
+    fetchBranches();
   }, [selectedRepo]);
 
   const handelOnClose = () => {

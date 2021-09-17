@@ -3,7 +3,6 @@ import * as React from "react";
 import Avatar from "@components/Avatar";
 import StarIcon from "@components/StarIcon/StarIcon";
 import { RepoItem } from "@store/GitHubStore/types";
-import { Link } from "react-router-dom";
 
 import styles from "./Card.module.scss";
 
@@ -32,9 +31,9 @@ const Card: React.FC<Props> = ({ repoItem, onClickCard }) => {
           </a>
         </div>
         <div>
-          <Link className={styles.orgName} to={repoItem.owner.html_url}>
+          <a className={styles.orgName} href={repoItem.owner.html_url}>
             {repoItem.owner.login}
-          </Link>
+          </a>
         </div>
         <div>
           <StarIcon />
