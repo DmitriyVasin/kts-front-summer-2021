@@ -3,12 +3,17 @@
     "react-app",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["prettier"],
+  "plugins": [
+    "prettier"
+  ],
   "rules": {
     "no-console": "error",
-    "prettier/prettier": ["error", {
-      "endOfLine":"auto"
-    }],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     "import/order": [
       "error",
       {
