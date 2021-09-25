@@ -1,18 +1,15 @@
 import * as React from "react";
 
-import { useReposContext } from "@pages/Main";
-
 import styles from "./Input.module.scss";
 
 type Props = {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  disabled: boolean;
 };
 
-const Input: React.FC<Props> = ({ value, placeholder, onChange }) => {
-  const reposContext = useReposContext();
-
+const Input: React.FC<Props> = ({ value, placeholder, onChange, disabled }) => {
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value);
   };
@@ -24,7 +21,7 @@ const Input: React.FC<Props> = ({ value, placeholder, onChange }) => {
       placeholder={placeholder}
       className={styles.searchInput}
       onChange={onChangeInput}
-      disabled={reposContext.isLoading}
+      disabled={disabled}
     />
   );
 };

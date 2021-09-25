@@ -65,7 +65,7 @@ const Main: React.FC = () => {
     if (result.success) {
       setState({
         ...state,
-        repos: [...state.repos, ...result.data],
+        repos: pageNum ? result.data : [...state.repos, ...result.data],
         isLoading: false,
       });
       if (result.data.length < 10) {
@@ -74,6 +74,7 @@ const Main: React.FC = () => {
         setInfiniteScrollState({
           ...infiniteScrollState,
           nextPage: infiniteScrollState.nextPage + 1,
+          hasMore: true,
         });
       }
     } else {

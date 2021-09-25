@@ -1,10 +1,8 @@
 import * as React from "react";
 
-import Button from "@components/Button";
-import Input from "@components/Input";
-import SearchIcon from "@components/SearchIcon";
-
 import styles from "./SearchBox.module.scss";
+import SearchButton from "./SearchButton";
+import SearchInput from "./SearchInput";
 
 type Props = {
   searchInputValue: string;
@@ -17,14 +15,12 @@ const SearchBox: React.FC<Props> = ({
 }) => {
   return (
     <div className={styles.searchBox}>
-      <Input
+      <SearchInput
         value={searchInputValue}
         placeholder="Ведите название организации"
         onChange={handelOnChangeSearchInputValue}
       />
-      <Button>
-        <SearchIcon />
-      </Button>
+      <SearchButton />
     </div>
   );
 };
