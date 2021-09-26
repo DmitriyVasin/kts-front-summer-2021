@@ -1,34 +1,31 @@
 import * as React from "react";
 
-import GitHubStore from "@store/GitHubStore";
-import { BranchItems } from "@store/GitHubStore/types";
+import ReposBranchStore from "@store/RepoBranchesStore";
+import { useLocalStore } from "@utils/useLocalStore";
 import { Drawer } from "antd";
 import { Divider } from "antd";
+import { observer } from "mobx-react-lite";
 import { useParams, useHistory } from "react-router-dom";
-
-const gitHubStore = new GitHubStore();
 
 type selectedRepo = {
   id: string;
 };
 
 const RepoBranchesDrawer: React.FC = () => {
-  const [branches, setBranches] = React.useState<BranchItems>([]);
+  const reposBranchStore = useLocalStore(() => new ReposBranchStore());
+
   const selectedRepo: selectedRepo = useParams();
   const history = useHistory();
+
   React.useEffect(() => {
     const fetchBranches = async () => {
-      const result = await gitHubStore.getRepoBranchListById({
+      await reposBranchStore.getRepoBranchListById({
         repoId: selectedRepo.id,
       });
-      if (result.success) {
-        setBranches(result.data);
-      } else {
-        setBranches([]);
-      }
     };
+    reposBranchStore.destroy();
     fetchBranches();
-  }, [selectedRepo]);
+  }, [selectedRepo, reposBranchStore]);
 
   const handelOnClose = () => {
     history.push("/repos");
@@ -36,7 +33,7 @@ const RepoBranchesDrawer: React.FC = () => {
 
   return (
     <Drawer placement="right" onClose={handelOnClose} visible={true}>
-      {branches.map((branch) => {
+      {reposBranchStore.list.map((branch) => {
         return (
           <div key={branch.id}>
             <p>{branch.name}</p>
@@ -48,4 +45,4 @@ const RepoBranchesDrawer: React.FC = () => {
   );
 };
 
-export default React.memo(RepoBranchesDrawer);
+export default observer(RepoBranchesDrawer);
