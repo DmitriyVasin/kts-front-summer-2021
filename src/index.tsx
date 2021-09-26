@@ -2,6 +2,8 @@ import React from "react";
 
 import ReactDOM from "react-dom";
 
+import "@config/configureMobX";
+
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";

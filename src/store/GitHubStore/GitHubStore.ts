@@ -1,4 +1,5 @@
 import { ApiResponse, HTTPMethod } from "@shared/store/ApiStore/types";
+import { ILocalStore } from "@utils/useLocalStore";
 
 import ApiStore from "../../shared/store/ApiStore";
 import {
@@ -15,7 +16,7 @@ import {
 
 const BASE_URL = "https://api.github.com";
 
-export default class GitHubStore implements IGitHubStore {
+export default class GitHubStore implements IGitHubStore, ILocalStore {
   private readonly apiStore = new ApiStore(BASE_URL);
 
   async getOrganizationReposList(
@@ -53,5 +54,9 @@ export default class GitHubStore implements IGitHubStore {
       method: HTTPMethod.GET,
       endpoint: `/repositories/${params.repoId}/branches`,
     });
+  }
+
+  destroy() {
+    // placeholder
   }
 }

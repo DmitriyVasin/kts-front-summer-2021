@@ -3,26 +3,26 @@ import * as React from "react";
 import Card from "@components/Card";
 import RepoBranchesDrawer from "@components/RepoBranchesDrawer";
 import SearchBox from "@components/SearchBox";
-import GitHubStore from "@store/GitHubStore";
-import { RepoItems } from "@store/GitHubStore/types";
+import { RepoItemModel } from "@store/models/gitHub";
+import ReposListStore from "@store/ReposListStore";
+import { useLocalStore } from "@utils/useLocalStore";
+import { observer } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Route, useHistory } from "react-router-dom";
 
 import styles from "./Main.module.scss";
 
 type ReposContext = {
-  list: RepoItems;
+  list: RepoItemModel[];
   isLoading: boolean;
   load: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
-
-const gitHubStore = new GitHubStore();
 
 const reposContext = React.createContext<ReposContext>({
   list: [],
   isLoading: false,
   load: (e: React.MouseEvent<HTMLButtonElement>) => {
-    // const loadVar = 0;
+    // placeholder
   },
 });
 
@@ -30,19 +30,15 @@ const ReposProvider = reposContext.Provider;
 
 export const useReposContext = () => React.useContext(reposContext);
 
-let initial: RepoItems = [];
-
 const Main: React.FC = () => {
-  const [state, setState] = React.useState({
-    isLoading: false,
-    repos: initial,
-  });
+  const reposListStore = useLocalStore(() => new ReposListStore());
 
   const [searchInputValue, setSearchInputValue] = React.useState("");
 
   const [infiniteScrollState, setInfiniteScrollState] = React.useState({
     nextPage: 1,
-    hasMore: true,
+    perPage: 10,
+    hasMore: false,
   });
 
   const history = useHistory();
@@ -53,57 +49,54 @@ const Main: React.FC = () => {
   const handelOnChangeSearchInputValue = (value: string) => {
     setSearchInputValue(value);
   };
-
-  const fetchReposPage = async (pageNum?: number) => {
-    const result = await gitHubStore.getOrganizationReposList({
+  const fetchRepos = async () => {
+    await reposListStore.getOrganizationReposList({
       organizationName: searchInputValue,
       data: {
-        page: pageNum ? pageNum : infiniteScrollState.nextPage,
-        per_page: 10,
+        page: infiniteScrollState.nextPage,
+        per_page: infiniteScrollState.perPage,
       },
     });
-    if (result.success) {
-      setState({
-        ...state,
-        repos: pageNum ? result.data : [...state.repos, ...result.data],
-        isLoading: false,
+    if (
+      reposListStore.meta === "success" &&
+      reposListStore.list.length % infiniteScrollState.perPage === 0
+    ) {
+      setInfiniteScrollState({
+        ...infiniteScrollState,
+        nextPage: infiniteScrollState.nextPage + 1,
+        hasMore: true,
       });
-      if (result.data.length < 10) {
-        setInfiniteScrollState({ ...infiniteScrollState, hasMore: false });
-      } else {
-        setInfiniteScrollState({
-          ...infiniteScrollState,
-          nextPage: infiniteScrollState.nextPage + 1,
-          hasMore: true,
-        });
-      }
     } else {
-      setState({ ...state, repos: [], isLoading: false });
+      setInfiniteScrollState({
+        ...infiniteScrollState,
+        nextPage: 1,
+        hasMore: false,
+      });
     }
   };
 
-  const handelOnClickSearchButton = async (
+  const handelOnClickSearchButton = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    setState({ ...state, isLoading: true });
-    await fetchReposPage(1);
+    reposListStore.destroy();
+    fetchRepos();
   };
 
-  const nextPartOfRepos = async () => {
-    await fetchReposPage();
+  const nextPartOfRepos = () => {
+    fetchRepos();
   };
 
   return (
     <ReposProvider
       value={{
-        list: state.repos,
-        isLoading: state.isLoading,
+        list: reposListStore.list,
+        isLoading: reposListStore.meta === "loading",
         load: handelOnClickSearchButton,
       }}
     >
       <div className={styles.grid}>
         <InfiniteScroll
-          dataLength={state.repos.length}
+          dataLength={reposListStore.list.length}
           next={nextPartOfRepos}
           hasMore={infiniteScrollState.hasMore}
           loader={<h4>Loading...</h4>}
@@ -117,7 +110,7 @@ const Main: React.FC = () => {
             searchInputValue={searchInputValue}
             handelOnChangeSearchInputValue={handelOnChangeSearchInputValue}
           />
-          {state.repos.map((repoItem) => {
+          {reposListStore.list.map((repoItem) => {
             return (
               <Card
                 repoItem={repoItem}
@@ -133,4 +126,4 @@ const Main: React.FC = () => {
   );
 };
 
-export default Main;
+export default observer(Main);
